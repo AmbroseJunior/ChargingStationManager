@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/WEB-INF/template/template.xhtml">
+    <ui:define name="title">Users</ui:define>
+    <ui:define name="content">
+        <h1>Manage Users</h1>
+        <h:form id="userTableForm">
+            <p:messages showDetail="true" showSummary="true" autoUpdate="true"/>
+            <!-- <h:outputText value="Debug: User count = #{appBean.allUsers.size()}" rendered="true" />-->
+            <p:dataTable id="userTable" value="#{appBean.allUsers}" var="user" rendered="#{not empty appBean.allUsers}">
+                <p:column headerText="Name">
+                    <h:outputText value="#{user.name}"/>
+                </p:column>
+                <p:column headerText="Email">
+                    <h:outputText value="#{user.email}"/>
+                </p:column>
+                <p:column headerText="Account Balance">
+                    <h:outputText value="#{user.accountBalance}"/>
+                </p:column>
+                <p:column headerText="Car Type">
+                    <h:outputText value="#{user.carType}"/>
+                </p:column>
+                <p:column headerText="Actions">
+                    <p:commandButton value="Edit" action="#{appBean.prepareEditUser(user)}" oncomplete="PF('editUserDialog').show()" update=":userEditForm" process="@this"/>
+                    <p:commandButton value="Delete" oncomplete="PF('deleteUserDialog').show()" update=":deleteUserForm" process="@this">
+                        <f:setPropertyActionListener value="#{user}" target="#{appBean.selectedUser}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:outputLabel value="No users found." rendered="#{empty appBean.allUsers}"/>
+        </h:form>
+
+        <!-- Edit Form -->
+        <h:form id="userEditForm">
+            <p:dialog header="Edit User" widgetVar="editUserDialog" modal="true" showEffect="fade" hideEffect="fade">
+                <p:panelGrid columns="2">
+                    <p:outputLabel for="editName" value="Name:"/>
+                    <p:inputText id="editName" value="#{appBean.userName}" required="true"/>
+                    <p:outputLabel for="editEmail" value="Email:"/>
+                    <p:inputText id="editEmail" value="#{appBean.userEmail}" required="true"/>
+                    <p:outputLabel for="editBalance" value="Account Balance:"/>
+                    <p:inputNumber id="editBalance" value="#{appBean.userAccountBalance}" required="true"/>
+                    <p:outputLabel for="editCarType" value="Car Type:"/>
+                    <p:inputText id="editCarType" value="#{appBean.userCarType}" required="true"/>
+                </p:panelGrid>
+                <p:commandButton value="Save" action="#{appBean.saveUser}" oncomplete="PF('editUserDialog').hide()" update=":userTableForm:userTable"/>
+                <p:commandButton value="Cancel" onclick="PF('editUserDialog').hide()" type="button"/>
+            </p:dialog>
+        </h:form>
+
+        <!-- Delete Confirmation Dialog -->
+        <h:form id="deleteUserForm">
+            <p:dialog header="Confirm Deletion" widgetVar="deleteUserDialog" modal="true" showEffect="fade" hideEffect="fade">
+                <p:outputLabel value="Are you sure you want to delete this user?" />
+                <p:panelGrid columns="2">
+                    <p:commandButton value="Yes" action="#{appBean.deleteUser(appBean.selectedUser)}" oncomplete="PF('deleteUserDialog').hide()" update=":userTableForm:userTable"/>
+                    <p:commandButton value="No" onclick="PF('deleteUserDialog').hide()" type="button"/>
+                </p:panelGrid>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

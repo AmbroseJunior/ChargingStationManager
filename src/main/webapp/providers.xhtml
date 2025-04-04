@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/WEB-INF/template/template.xhtml">
+    <ui:define name="title">Providers</ui:define>
+    <ui:define name="content">
+        <h1>Manage Providers</h1>
+        <h:form id="providerTableForm">
+            <p:messages showDetail="true" showSummary="true" autoUpdate="true"/>
+            <!--<h:outputText value="Debug: Provider count = #{appBean.allProviders.size()}" rendered="true" />-->
+            <p:dataTable id="providerTable" value="#{appBean.allProviders}" var="provider" rendered="#{not empty appBean.allProviders}">
+                <p:column headerText="Name">
+                    <h:outputText value="#{provider.name}"/>
+                </p:column>
+                <p:column headerText="Contact Info">
+                    <h:outputText value="#{provider.contactInfo}"/>
+                </p:column>
+                <p:column headerText="Actions">
+                    <p:commandButton value="Edit" action="#{appBean.prepareEditProvider(provider)}" oncomplete="PF('editProviderDialog').show()" update=":providerEditForm" process="@this"/>
+                    <p:commandButton value="Delete" oncomplete="PF('deleteProviderDialog').show()" update=":deleteProviderForm" process="@this">
+                        <f:setPropertyActionListener value="#{provider}" target="#{appBean.selectedProvider}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:outputLabel value="No providers found." rendered="#{empty appBean.allProviders}"/>
+        </h:form>
+
+        <!-- Edit Form -->
+        <h:form id="providerEditForm">
+            <p:dialog header="Edit Provider" widgetVar="editProviderDialog" modal="true" showEffect="fade" hideEffect="fade">
+                <p:panelGrid columns="2">
+                    <p:outputLabel for="editProviderName" value="Name:"/>
+                    <p:inputText id="editProviderName" value="#{appBean.providerName}" required="true"/>
+                    <p:outputLabel for="editProviderContact" value="Contact Info:"/>
+                    <p:inputText id="editProviderContact" value="#{appBean.providerContactInfo}" required="true"/>
+                </p:panelGrid>
+                <p:commandButton value="Save" action="#{appBean.saveProvider}" oncomplete="PF('editProviderDialog').hide()" update=":providerTableForm:providerTable"/>
+                <p:commandButton value="Cancel" onclick="PF('editProviderDialog').hide()" type="button"/>
+            </p:dialog>
+        </h:form>
+
+        <!-- Delete Confirmation Dialog -->
+        <h:form id="deleteProviderForm">
+            <p:dialog header="Confirm Deletion" widgetVar="deleteProviderDialog" modal="true" showEffect="fade" hideEffect="fade">
+                <p:outputLabel value="Are you sure you want to delete this provider?" />
+                <p:panelGrid columns="2">
+                    <p:commandButton value="Yes" action="#{appBean.deleteProvider(appBean.selectedProvider)}" oncomplete="PF('deleteProviderDialog').hide()" update=":providerTableForm:providerTable"/>
+                    <p:commandButton value="No" onclick="PF('deleteProviderDialog').hide()" type="button"/>
+                </p:panelGrid>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/WEB-INF/template/template.xhtml">
+    <ui:define name="title">Welcome</ui:define>
+    <ui:define name="content">
+        <h1>Welcome to the Charging Station Management App</h1>
+        <p>Use the menu to manage providers, charging stations, and users.</p>
+        <h:form>
+            <p:commandButton value="List Providers, Stations, and Users" action="#{appBean.listProvidersAndStations}" update="providerTable,stationTable,userTable" process="@this"/>
+        </h:form>
+
+        <h2>Providers</h2>
+        <p:dataTable id="providerTable" value="#{appBean.allProviders}" var="provider" rendered="#{not empty appBean.allProviders}">
+            <p:column headerText="Name">
+                <h:outputText value="#{provider.name}"/>
+            </p:column>
+            <p:column headerText="Contact Info">
+                <h:outputText value="#{provider.contactInfo}"/>
+            </p:column>
+        </p:dataTable>
+        <p:outputLabel value="No providers found." rendered="#{empty appBean.allProviders}"/>
+
+        <h2>Charging Stations</h2>
+        <p:dataTable id="stationTable" value="#{appBean.allChargingStations}" var="station" rendered="#{not empty appBean.allChargingStations}">
+            <p:column headerText="ID">
+                <h:outputText value="#{station.id}"/>
+            </p:column>
+            <p:column headerText="Location">
+                <h:outputText value="#{station.location}"/>
+            </p:column>
+            <p:column headerText="Status">
+                <h:outputText value="#{station.status}"/>
+            </p:column>
+        </p:dataTable>
+        <p:outputLabel value="No charging stations found." rendered="#{empty appBean.allChargingStations}"/>
+
+        <h2>Users</h2>
+        <p:dataTable id="userTable" value="#{appBean.allUsers}" var="user" rendered="#{not empty appBean.allUsers}">
+            <p:column headerText="Name">
+                <h:outputText value="#{user.name}"/>
+            </p:column>
+            <p:column headerText="Email">
+                <h:outputText value="#{user.email}"/>
+            </p:column>
+        </p:dataTable>
+        <p:outputLabel value="No users found." rendered="#{empty appBean.allUsers}"/>
+    </ui:define>
+</ui:composition>
+</html>

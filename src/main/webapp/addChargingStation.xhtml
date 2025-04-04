@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/WEB-INF/template/template.xhtml">
+    <ui:define name="title">Add Charging Station</ui:define>
+    <ui:define name="content">
+        <h1>Add Charging Station</h1>
+        <h:form id="addStationForm">
+            <p:messages showDetail="true" showSummary="true" autoUpdate="true"/>
+            <p:panel header="Charging Station Details">
+                <p:panelGrid columns="2">
+                    <p:outputLabel for="stationProvider" value="Provider: *"/>
+                    <p:selectOneMenu id="stationProvider" value="#{appBean.stationProvider}" required="true" converter="providerConverter">
+                        <f:selectItem itemLabel="Select Provider" itemValue="#{null}"/>
+                        <f:selectItems value="#{appBean.allProviders}" var="prov" itemLabel="#{prov.name}" itemValue="#{prov}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel for="stationLocation" value="Location: *"/>
+                    <p:inputText id="stationLocation" value="#{appBean.stationLocation}" required="true"/>
+                    <p:outputLabel for="stationStatus" value="Status: *"/>
+                    <p:selectOneMenu id="stationStatus" value="#{appBean.stationStatus}" required="true">
+                        <f:selectItem itemLabel="Select Status" itemValue="#{null}"/>
+                        <f:selectItem itemLabel="OPERATIONAL" itemValue="OPERATIONAL"/>
+                        <f:selectItem itemLabel="MAINTENANCE" itemValue="MAINTENANCE"/>
+                        <f:selectItem itemLabel="OCCUPIED" itemValue="OCCUPIED"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel for="stationChargingSpeed" value="Charging Speed: *"/>
+                    <p:inputNumber id="stationChargingSpeed" value="#{appBean.stationChargingSpeed}" required="true"/>
+                    <p:outputLabel for="stationRegion" value="Region: *"/>
+                    <p:inputText id="stationRegion" value="#{appBean.stationRegion}" required="true"/>
+                    <p:outputLabel for="stationPrice" value="Price per kWh: *"/>
+                    <p:inputNumber id="stationPrice" value="#{appBean.stationPricePerKWh}" required="true"/>
+                    <p:outputLabel for="stationConnector" value="Connector Type: *"/>
+                    <p:inputText id="stationConnector" value="#{appBean.stationConnectorType}" required="true"/>
+                    <p:outputLabel for="stationAvailable" value="Available:"/>
+                    <p:selectBooleanCheckbox id="stationAvailable" value="#{appBean.stationIsAvailable}"/>
+                </p:panelGrid>
+                <p:commandButton value="Save" action="#{appBean.saveChargingStation}" update="@form"/>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>
