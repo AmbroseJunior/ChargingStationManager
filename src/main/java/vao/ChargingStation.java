@@ -1,13 +1,24 @@
 package vao;
 import Observers.ChargingStationObserver;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ChargingStation {
+@Entity
+@Table(name = "charging_station")
+public class ChargingStation  implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private Provider providerId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provider_id", nullable = false)
+    private Provider provider;
+
     private String location;
     private String status;
     private double chargingSpeed;
@@ -16,13 +27,13 @@ public class ChargingStation {
     private boolean isAvailable;
     private String connectorType;
     private double pricePerKWh;
-    private final List<ChargingStationObserver> observers = new ArrayList<>();
+
+    public ChargingStation() {}
 
 
-    public ChargingStation(UUID id, Provider providerId, String location, String status, double chargingSpeed, String region,
+    public ChargingStation(Provider provider, String location, String status, double chargingSpeed, String region,
                            double pricePerKWh, String connectorType, boolean isAvailable) {
-        this.id = id;
-        this.providerId = providerId;
+        this.provider = provider;
         this.location = location;
         this.status = status;
         this.chargingSpeed = chargingSpeed;
@@ -37,9 +48,12 @@ public class ChargingStation {
     public void setId(UUID id) {
         this.id = id;
     }
-    public Provider getProvider() { return providerId; }
-    public void setProvider(Provider providerId) {
-        this.providerId = providerId;
+    public Provider getProvider() { return provider; }
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+        if (provider != null && !provider.getChargingStations().contains(this)) {
+            provider.addChargingStation(this);
+        }
     }
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
@@ -48,7 +62,6 @@ public class ChargingStation {
     public void setStatus(String newStatus) {
         String previousStatus = this.status;
         this.status = newStatus;
-        notifyObservers(previousStatus);
     }
     public double getChargingSpeed() { return chargingSpeed; }
     public void setChargingSpeed(double chargingSpeed) { this.chargingSpeed = chargingSpeed; }
@@ -56,9 +69,6 @@ public class ChargingStation {
     public void setRegion(String region) { this.region = region; }
     public boolean isActive() {
         return status.equalsIgnoreCase("OPERATIONAL");
-    }
-    public List<ChargingStationObserver> getObservers() {
-        return observers;
     }
     public String getConnectorType() {
         return connectorType;
@@ -81,19 +91,10 @@ public class ChargingStation {
         this.isAvailable = isAvailable;
     }
 
-    public void addObserver(ChargingStationObserver observer) {
-        observers.add(observer);
-    }
     public String getCurrentUserEmail() {
         return currentUserEmail;
     }
     public void setCurrentUserEmail(String email) {
         this.currentUserEmail = email;
-        notifyObservers(this.status);
     }
-    public void notifyObservers(String previousStatus) {
-        for (ChargingStationObserver observer : observers) {
-            observer.update(this, previousStatus);
 }
-    }
-};

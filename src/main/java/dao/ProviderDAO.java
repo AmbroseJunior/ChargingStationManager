@@ -1,54 +1,52 @@
 package dao;
 
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import vao.Provider;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
-public class ProviderDAO implements ProviderDAOInterface {
-    private static ProviderDAO instance;
-    private final Map<UUID, Provider> providers = new HashMap<>();
+@Stateless
+public class ProviderDAO {
+    @PersistenceContext(unitName = "wildPU")
+    private EntityManager em;
 
-    private ProviderDAO() {}
-
-    public static ProviderDAO getInstance() {
-        if (instance == null) {
-            synchronized (ProviderDAO.class) {
-                if (instance == null) {
-                    instance = new ProviderDAO();
-                }
-            }
-        }
-        return instance;
-    }
-
-    @Override
-    public Provider addProvider(Provider provider) {
-        if (provider != null && provider.getId() != null) {
-        providers.put(provider.getId(), provider);
-        }
+    public Provider create(Provider provider) {
+        em.persist(provider);
         return provider;
     }
 
-    @Override
-    public Provider getProviderById(UUID id) {
-        return providers.get(id);
+    public Provider findById(UUID id) {
+        return em.createQuery(
+                        "SELECT p FROM Provider p LEFT JOIN FETCH p.chargingStations WHERE p.id = :id", Provider.class)
+                .setParameter("id", id)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
-    @Override
-    public List<Provider> getAllProviders() {
-        return new ArrayList<>(providers.values());
+    public Provider findByName(String name) {
+        return em.createQuery("SELECT p FROM Provider p WHERE p.name = :name", Provider.class)
+                .setParameter("name", name)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
-    @Override
-    public void updateProvider(Provider provider) {
-        if (provider != null && provider.getId() != null) {
-            providers.put(provider.getId(), provider);
+    public List<Provider> findAll() {
+        return em.createQuery("SELECT p FROM Provider p", Provider.class).getResultList();
+    }
+
+    public Provider update(Provider provider) {
+        return em.merge(provider);
+    }
+
+    public void delete(UUID id) {
+        Provider provider = em.find(Provider.class, id);
+        if (provider != null) {
+            em.remove(provider);
         }
     }
-
-    @Override
-    public void deleteProvider(UUID id) {
-        providers.remove(id);
-    }
-
 }

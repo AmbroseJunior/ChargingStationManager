@@ -1,26 +1,40 @@
 package vao;
 
+import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Provider {
+@Entity
+@Table(name = "provider")
+public class Provider implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String name;
-    private String contactInfo;
-    private final List<ChargingStation> chargingStations;
 
-    public Provider(UUID id, String name, String contactInfo) {
-        this.id = id;
+    @Column(unique = true, nullable = false)
+    private String name;
+
+
+    private String contactInfo;
+
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChargingStation> chargingStations = new ArrayList<>();
+
+
+    public Provider() {}
+
+    public Provider(String name, String contactInfo) {
         this.name = name;
         this.contactInfo = contactInfo;
-        this.chargingStations = new ArrayList<>();
     }
 
     public void addChargingStation(ChargingStation chargingStation) {
         chargingStations.add(chargingStation);
+        chargingStation.setProvider(this);
     }
-
     // Getters and Setters
     public UUID getId() {
         return id;
@@ -63,6 +77,7 @@ public class Provider {
             System.out.println("Charging station not found!");
         }
     }
+
     public Provider orElse(Object o) {
         return null;
     }

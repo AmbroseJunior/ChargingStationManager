@@ -1,64 +1,43 @@
 package dao;
 
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import vao.User;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import java.util.*;
+@Stateless
+public class UserDAO {
+    @PersistenceContext(unitName = "wildPU")
+    private EntityManager em;
 
-public class UserDAO implements UserDAOInterface {
-    private static UserDAO instance;
-    private static final Map<String, User> users = new HashMap<>();
-
-    private UserDAO() {}
-
-    public static UserDAO getInstance() {
-        if (instance == null) {
-            synchronized (UserDAO.class) {
-                if (instance == null) {
-                    instance = new UserDAO();
-                }
-            }
-        }
-        return instance;
+    public User create(User user) {
+        em.persist(user);
+        return user;
     }
 
-    public User getUser(String name) {
-        return users.get(name);
+    public User findById(UUID id) {
+        return em.find(User.class, id);
     }
 
-    public static void saveUser(User user) {
-        users.put(user.getName(), user);
+    public Optional<User> findByName(String name) {
+        return em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class)
+                .setParameter("name", name)
+                .getResultStream()
+                .findFirst();
     }
 
-    @Override
-    public void insertUser(User user) {
-        if (user != null && user.getId() != null) {
-            users.put(user.getName(), user);
-        }
+    public List<User> findAll() {
+        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 
-    @Override
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+    public User update(User user) {
+        return em.merge(user);
     }
 
-    @Override
-    public Optional<User> getUserByName(String name) {
-        User user = users.get(name);
-        return Optional.ofNullable(user);
-    }
-
-    @Override
-    public void updateUser(String email, String name) {
-        Optional<User> userOpt = getUserByName(name);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setEmail(email);
-            users.put(name, user);
-        }
-    }
-
-    @Override
-    public void deleteUser(String name) {
-        users.remove(name);
+    public void delete(String name) {
+        findByName(name).ifPresent(user -> em.remove(user));
     }
 }

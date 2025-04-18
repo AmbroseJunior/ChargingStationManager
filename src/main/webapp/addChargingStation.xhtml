@@ -7,16 +7,18 @@
 <ui:composition template="/WEB-INF/template/template.xhtml">
     <ui:define name="title">Add Charging Station</ui:define>
     <ui:define name="content">
-        <h1>Add Charging Station</h1>
+        <h1 class="text-primary">Add Charging Station</h1>
         <h:form id="addStationForm">
             <p:messages showDetail="true" showSummary="true" autoUpdate="true"/>
-            <p:panel header="Charging Station Details">
-                <p:panelGrid columns="2">
+            <p:panel header="Charging Station Details" styleClass="mb-4">
+                <p:panelGrid columns="2" styleClass="p-panelgrid-blank">
                     <p:outputLabel for="stationProvider" value="Provider: *"/>
-                    <p:selectOneMenu id="stationProvider" value="#{appBean.stationProvider}" required="true" converter="providerConverter">
-                        <f:selectItem itemLabel="Select Provider" itemValue="#{null}"/>
-                        <f:selectItems value="#{appBean.allProviders}" var="prov" itemLabel="#{prov.name}" itemValue="#{prov}"/>
+                    <p:selectOneMenu id="stationProvider" value="#{appBean.stationProviderId}" required="true">
+                        <f:selectItem itemLabel="Select Provider" itemValue="#{null}" />
+                        <f:selectItems value="#{appBean.allProviders}" var="prov"
+                                       itemLabel="#{prov.name}" itemValue="#{prov.id}" />
                     </p:selectOneMenu>
+
                     <p:outputLabel for="stationLocation" value="Location: *"/>
                     <p:inputText id="stationLocation" value="#{appBean.stationLocation}" required="true"/>
                     <p:outputLabel for="stationStatus" value="Status: *"/>
@@ -37,7 +39,8 @@
                     <p:outputLabel for="stationAvailable" value="Available:"/>
                     <p:selectBooleanCheckbox id="stationAvailable" value="#{appBean.stationIsAvailable}"/>
                 </p:panelGrid>
-                <p:commandButton value="Save" action="#{appBean.saveChargingStation}" update="@form"/>
+                <p:commandButton value="Save" action="#{appBean.saveChargingStation}" update="@form"
+                                 styleClass="ui-button-raised ui-button-success"/>
             </p:panel>
         </h:form>
     </ui:define>

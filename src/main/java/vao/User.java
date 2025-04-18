@@ -1,16 +1,26 @@
 package vao;
 
-import java.util.UUID;
+import jakarta.persistence.*;
 
-public class User {
+import java.io.Serializable;
+import java.util.UUID;
+@Entity
+@Table(name = "users")
+public class User implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(unique = true, nullable = false)
     private String name;
+    @Column(unique = true, nullable = false)
     private String email;
+
     private double accountBalance;
     private String carType;
 
-    public User(UUID id, String name, String email, double accountBalance, String carType) {
-        this.id = id;
+    public User() {}
+
+    public User(String name, String email, double accountBalance, String carType) {
         this.name = name;
         this.email = email;
         this.accountBalance = accountBalance;

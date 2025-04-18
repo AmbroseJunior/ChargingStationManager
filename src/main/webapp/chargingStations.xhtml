@@ -6,12 +6,15 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <ui:composition template="/WEB-INF/template/template.xhtml">
     <ui:define name="title">Charging Stations</ui:define>
+
     <ui:define name="content">
         <h1>Manage Charging Stations</h1>
+
+        <!-- Charging Station Table -->
         <h:form id="stationTableForm">
             <p:messages showDetail="true" showSummary="true" autoUpdate="true"/>
-            <!-- <h:outputText value="Debug: Station count = #{appBean.allChargingStations.size()}" rendered="true" />-->
-            <p:dataTable id="stationTable" value="#{appBean.allChargingStations}" var="station" rendered="#{not empty appBean.allChargingStations}">
+            <p:dataTable id="stationTable" value="#{appBean.allChargingStations}" var="station"
+                         rendered="#{not empty appBean.allChargingStations}">
                 <p:column headerText="ID">
                     <h:outputText value="#{station.id}"/>
                 </p:column>
@@ -22,8 +25,13 @@
                     <h:outputText value="#{station.status}"/>
                 </p:column>
                 <p:column headerText="Actions">
-                    <p:commandButton value="Edit" action="#{appBean.prepareEditChargingStation(station)}" oncomplete="PF('editStationDialog').show()" update=":stationEditForm" process="@this"/>
-                    <p:commandButton value="Delete" oncomplete="PF('deleteStationDialog').show()" update=":deleteStationForm" process="@this">
+                    <p:commandButton value="Edit"
+                                     action="#{appBean.prepareEditChargingStation(station)}"
+                                     oncomplete="PF('editStationDialog').show()"
+                                     update=":stationEditForm" process="@this"/>
+                    <p:commandButton value="Delete"
+                                     oncomplete="PF('deleteStationDialog').show()"
+                                     update=":deleteStationForm" process="@this">
                         <f:setPropertyActionListener value="#{station}" target="#{appBean.selectedStation}"/>
                     </p:commandButton>
                 </p:column>
@@ -31,17 +39,21 @@
             <p:outputLabel value="No charging stations found." rendered="#{empty appBean.allChargingStations}"/>
         </h:form>
 
-        <!-- Edit Form -->
+        <!-- Edit Charging Station Dialog -->
         <h:form id="stationEditForm">
-            <p:dialog header="Edit Charging Station" widgetVar="editStationDialog" modal="true" showEffect="fade" hideEffect="fade">
+            <p:dialog header="Edit Charging Station" widgetVar="editStationDialog" modal="true"
+                      showEffect="fade" hideEffect="fade">
                 <p:panelGrid columns="2">
                     <p:outputLabel for="editStationProvider" value="Provider:"/>
-                    <p:selectOneMenu id="editStationProvider" value="#{appBean.stationProvider}" required="true" converter="providerConverter">
-                        <f:selectItem itemLabel="Select Provider" itemValue="#{null}"/>
-                        <f:selectItems value="#{appBean.allProviders}" var="prov" itemLabel="#{prov.name}" itemValue="#{prov}"/>
+                    <p:selectOneMenu id="editStationProvider" value="#{appBean.stationProviderId}" required="true">
+                        <f:selectItem itemLabel="Select Provider" itemValue=""/>
+                        <f:selectItems value="#{appBean.allProviders}" var="prov"
+                                       itemLabel="#{prov.name}" itemValue="#{prov.id}"/>
                     </p:selectOneMenu>
+
                     <p:outputLabel for="editStationLocation" value="Location:"/>
                     <p:inputText id="editStationLocation" value="#{appBean.stationLocation}" required="true"/>
+
                     <p:outputLabel for="editStationStatus" value="Status:"/>
                     <p:selectOneMenu id="editStationStatus" value="#{appBean.stationStatus}" required="true">
                         <f:selectItem itemLabel="Select Status" itemValue="#{null}"/>
@@ -49,29 +61,44 @@
                         <f:selectItem itemLabel="MAINTENANCE" itemValue="MAINTENANCE"/>
                         <f:selectItem itemLabel="OCCUPIED" itemValue="OCCUPIED"/>
                     </p:selectOneMenu>
+
                     <p:outputLabel for="editStationChargingSpeed" value="Charging Speed:"/>
                     <p:inputNumber id="editStationChargingSpeed" value="#{appBean.stationChargingSpeed}" required="true"/>
+
                     <p:outputLabel for="editStationRegion" value="Region:"/>
                     <p:inputText id="editStationRegion" value="#{appBean.stationRegion}" required="true"/>
+
                     <p:outputLabel for="editStationPrice" value="Price per kWh:"/>
                     <p:inputNumber id="editStationPrice" value="#{appBean.stationPricePerKWh}" required="true"/>
+
                     <p:outputLabel for="editStationConnectorType" value="Connector Type:"/>
                     <p:inputText id="editStationConnectorType" value="#{appBean.stationConnectorType}" required="true"/>
+
                     <p:outputLabel for="editStationAvailable" value="Available:"/>
                     <p:selectBooleanCheckbox id="editStationAvailable" value="#{appBean.stationIsAvailable}"/>
                 </p:panelGrid>
-                <p:commandButton value="Save" action="#{appBean.saveChargingStation}" oncomplete="PF('editStationDialog').hide()" update=":stationTableForm:stationTable"/>
-                <p:commandButton value="Cancel" onclick="PF('editStationDialog').hide()" type="button"/>
+
+                <p:commandButton value="Save"
+                                 action="#{appBean.saveChargingStation}"
+                                 oncomplete="PF('editStationDialog').hide()"
+                                 update=":stationTableForm:stationTable"/>
+                <p:commandButton value="Cancel"
+                                 onclick="PF('editStationDialog').hide()" type="button"/>
             </p:dialog>
         </h:form>
 
         <!-- Delete Confirmation Dialog -->
         <h:form id="deleteStationForm">
-            <p:dialog header="Confirm Deletion" widgetVar="deleteStationDialog" modal="true" showEffect="fade" hideEffect="fade">
+            <p:dialog header="Confirm Deletion" widgetVar="deleteStationDialog" modal="true"
+                      showEffect="fade" hideEffect="fade">
                 <p:outputLabel value="Are you sure you want to delete this charging station?" />
                 <p:panelGrid columns="2">
-                    <p:commandButton value="Yes" action="#{appBean.deleteChargingStation(appBean.selectedStation)}" oncomplete="PF('deleteStationDialog').hide()" update=":stationTableForm:stationTable"/>
-                    <p:commandButton value="No" onclick="PF('deleteStationDialog').hide()" type="button"/>
+                    <p:commandButton value="Yes"
+                                     action="#{appBean.deleteChargingStation(appBean.selectedStation)}"
+                                     oncomplete="PF('deleteStationDialog').hide()"
+                                     update=":stationTableForm:stationTable"/>
+                    <p:commandButton value="No"
+                                     onclick="PF('deleteStationDialog').hide()" type="button"/>
                 </p:panelGrid>
             </p:dialog>
         </h:form>
